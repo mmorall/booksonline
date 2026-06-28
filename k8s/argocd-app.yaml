@@ -5,16 +5,19 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: 'https://github.com/mmorall/booksonline.git'
-    targetRevision: HEAD
-    path: k8s
+  sources:
+    - repoURL: 'https://github.com/mmorall/booksonline.git'
+      targetRevision: HEAD
+      path: k8s/infrastructure # Force watch the DB layer
+    - repoURL: 'https://github.com/mmorall/booksonline.git'
+      targetRevision: HEAD
+      path: k8s/application    # Force watch the App layer
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: books-online
   syncPolicy:
     automated:
-      prune: true     # Automatically delete k8s resources if you delete them from Git
-      selfHeal: true  # If a human modifies a setting manually, Argo resets it
+      prune: true
+      selfHeal: true
     syncOptions:
     - CreateNamespace=true
