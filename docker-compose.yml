@@ -2,7 +2,7 @@ services:
   # matching CloudNativePG version
   postgres:
     image: postgres:16-alpine
-    container_name: bookstore-db-local
+    container_name: booksonline-db-local
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

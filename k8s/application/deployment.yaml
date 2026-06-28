@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bookstore-api
+  name: booksonline-api
   namespace: books-online
   labels:
-    app: bookstore-api
+    app: booksonline-api
 spec:
   replicas: 1 # Starts at 1, HPA will scale it up if needed
   selector:
     matchLabels:
-      app: bookstore-api
+      app: booksonline-api
   template:
     metadata:
       labels:
-        app: bookstore-api
+        app: booksonline-api
     spec:
       containers:
       - name: api
-        image: ghcr.io/mmorall/bookstore-api:latest
+        image: ghcr.io/mmorall/booksonline-api:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -57,11 +57,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: bookstore-api-svc
+  name: booksonline-api-svc
   namespace: books-online
 spec:
   selector:
-    app: bookstore-api
+    app: booksonline-api
   ports:
     - protocol: TCP
       port: 80
