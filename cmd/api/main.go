@@ -15,8 +15,8 @@ import (
 	"github.com/mmorall/booksonline/internal/catalog/adapters"
 	"github.com/mmorall/booksonline/internal/catalog/db/migrations"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
+	migrate "github.com/golang-migrate/migrate/v4"
+	migratepg "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -93,7 +93,7 @@ func runDBMigrations(db *sql.DB) {
 		log.Fatalf("Failed to create migration source driver: %v", err)
 	}
 
-	dbDriver, err := postgres.WithInstance(db, &postgres.Config{})
+	dbDriver, err := migratepg.WithInstance(db, &migratepg.Config{})
 	if err != nil {
 		log.Fatalf("Failed to create database driver: %v", err)
 	}
