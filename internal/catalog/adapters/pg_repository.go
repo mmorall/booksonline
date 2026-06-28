@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/mmorall/booksonline/internal/catalog"
@@ -42,7 +43,11 @@ func (r *PostgresRepository) ListAll(ctx context.Context) ([]*catalog.Product, e
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("Error closing rows: %v", err)
+		}
+	}()
 
 	var products []*catalog.Product
 	for rows.Next() {

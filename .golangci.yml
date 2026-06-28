@@ -1,29 +1,34 @@
+version: "2"
+
 run:
   timeout: 3m
-  issues-exit-code: 1
 
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-  gofmt:
-    simplify: true
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
+issues-exit-code: 1
 
 linters:
-  disable-all: true
+  default: none
   enable:
-    - gofmt
     - govet
     - errcheck
     - staticcheck
-    - gosimple
     - ineffassign
-    - typecheck
     - unused
+
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+
+formatters:
+  enable:
+    - gofmt
+  settings:
+    gofmt:
+      simplify: true
 
 issues:
   max-issues-per-linter: 0

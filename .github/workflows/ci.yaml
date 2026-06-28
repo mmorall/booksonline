@@ -32,7 +32,7 @@ jobs:
       - name: Lint Code
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.59
+          version: v2.12.2
 
       - name: Run Unit Tests & Coverage
         run: go test -v -race -cover ./...
