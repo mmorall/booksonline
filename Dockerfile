@@ -1,6 +1,9 @@
-FROM golang:1.22.11-alpine3.20 AS builder
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
+
+# Fail loudly if there is a version mismatch
+ENV GOTOOLCHAIN=local
 
 RUN apk add --no-cache ca-certificates
 
