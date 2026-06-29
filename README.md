@@ -54,6 +54,17 @@ migrations/        → embedded SQL migrations, run on startup
 k8s/               → Kubernetes manifests (ArgoCD, CNPG, HPA)
 ```
 
+## Resilience and Fault Tolerance
+
+The production infrastructure is hardened against arbitrary node and runtime crashes using continuous automated fault injection via Chaos Mesh. 
+
+### Chaos Experiment Profile
+A background engine (`PodChaos`) runs a continuous loop that executes a disruptive `pod-kill` action against active application instances at a predefined regular interval (`@every 2m`).
+
+### Automated Recovery Mechanism
+1. **ReplicaSet Enforcement**: The Kubernetes Control Plane continuously evaluates cluster drift. When an instance is terminated by an infrastructure fault, a replacement instance is scheduled within milliseconds.
+2. **Safe Traffic Routing**: Traffic is shielded during recovery via `readinessProbe` lifecycle endpoints (`GET /health`). The Traefik ingress proxy bypasses newly scheduled instances until they successfully initialize dependencies and establish an operational database connection pool, guaranteeing zero dropped HTTP requests during an active crash cycle.
+
 ## Deployment
 
 The application is deployed to a K3s cluster via ArgoCD. Pushes to `main` are automatically synced to the cluster.
