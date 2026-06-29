@@ -23,6 +23,13 @@ func (h *HTTPHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /products/{id}", h.handleGetProduct)
 }
 
+// handleListProducts lists all available products
+// @Summary List products
+// @Description Returns the entire product catalog
+// @Tags catalog
+// @Produce json
+// @Success 200 {array} catalog.Product
+// @Router /products [get]
 func (h *HTTPHandler) handleListProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := h.svc.ListProducts(r.Context())
 	if err != nil {
@@ -37,6 +44,15 @@ func (h *HTTPHandler) handleListProducts(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// handleGetProduct retrieves a product by ID
+// @Summary Get product by ID
+// @Description Returns a single product detail by UUID
+// @Tags catalog
+// @Param id path string true "Product UUID"
+// @Produce json
+// @Success 200 {object} catalog.Product
+// @Failure 404 {string} string "Not Found"
+// @Router /products/{id} [get]
 func (h *HTTPHandler) handleGetProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := uuid.Parse(idStr)

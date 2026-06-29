@@ -18,12 +18,20 @@ import (
 	"github.com/mmorall/booksonline/internal/orders"
 	ordersAdapters "github.com/mmorall/booksonline/internal/orders/adapters"
 
+	_ "github.com/mmorall/booksonline/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	migrate "github.com/golang-migrate/migrate/v4"
 	migratepg "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/lib/pq"
 )
 
+// @title BooksOnline API
+// @version 1.0
+// @description Backend service for managing catalog and orders.
+// @host api-bookstore.mydomain.com
+// @BasePath /
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
@@ -66,6 +74,8 @@ func main() {
 	mux := http.NewServeMux()
 	catalogHandler.RegisterRoutes(mux)
 	ordersHandler.RegisterRoutes(mux)
+
+	mux.HandleFunc("GET /swagger/", httpSwagger.WrapHandler)
 
 	// Required for Kubernetes Liveness/Readiness Probes
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {

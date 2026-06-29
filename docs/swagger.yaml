@@ -1,0 +1,205 @@
+basePath: /
+definitions:
+  adapters.CreateOrderRequest:
+    properties:
+      customer_email:
+        type: string
+      items:
+        additionalProperties:
+          type: integer
+        type: object
+    type: object
+  catalog.Product:
+    properties:
+      id:
+        type: string
+      isActive:
+        type: boolean
+      name:
+        type: string
+      priceInCents:
+        format: int64
+        type: integer
+      sku:
+        type: string
+      stock:
+        type: integer
+      type:
+        $ref: '#/definitions/catalog.ProductType'
+    type: object
+  catalog.ProductType:
+    enum:
+    - BOOK
+    - LICENSE
+    - VOUCHER
+    type: string
+    x-enum-varnames:
+    - TypeBook
+    - TypeLicense
+    - TypeVoucher
+  orders.Order:
+    properties:
+      createdAt:
+        type: string
+      customerEmail:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/orders.OrderItem'
+        type: array
+      status:
+        $ref: '#/definitions/orders.OrderStatus'
+      totalPrice:
+        format: int64
+        type: integer
+    type: object
+  orders.OrderItem:
+    properties:
+      generatedAsset:
+        description: For License or Voucher this holds the generated key/code
+        type: string
+      id:
+        type: string
+      orderID:
+        type: string
+      price:
+        format: int64
+        type: integer
+      productID:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  orders.OrderStatus:
+    enum:
+    - PENDING
+    - COMPLETED
+    - FAILED
+    type: string
+    x-enum-varnames:
+    - StatusPending
+    - StatusCompleted
+    - StatusFailed
+host: api-bookstore.mydomain.com
+info:
+  contact: {}
+  description: Backend service for managing catalog and orders.
+  title: BooksOnline API
+  version: "1.0"
+paths:
+  /orders:
+    get:
+      description: Returns all orders (Admin only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/orders.Order'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: List all orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Creates an order and generates digital keys for licenses/vouchers
+      parameters:
+      - description: Order request
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/adapters.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/orders.Order'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Place a new order
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      description: Returns order details (Admin only)
+      parameters:
+      - description: Order UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/orders.Order'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get order by ID
+      tags:
+      - orders
+  /products:
+    get:
+      description: Returns the entire product catalog
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/catalog.Product'
+            type: array
+      summary: List products
+      tags:
+      - catalog
+  /products/{id}:
+    get:
+      description: Returns a single product detail by UUID
+      parameters:
+      - description: Product UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/catalog.Product'
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Get product by ID
+      tags:
+      - catalog
+swagger: "2.0"

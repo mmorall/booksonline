@@ -49,6 +49,16 @@ type CreateOrderRequest struct {
 	Items         map[string]int `json:"items"`
 }
 
+// handleCreateOrder creates a new order
+// @Summary Place a new order
+// @Description Creates an order and generates digital keys for licenses/vouchers
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param order body CreateOrderRequest true "Order request"
+// @Success 201 {object} orders.Order
+// @Failure 400 {string} string "Bad Request"
+// @Router /orders [post]
 func (h *HTTPHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	var req CreateOrderRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -88,6 +98,15 @@ func (h *HTTPHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// handleListOrders lists all historic orders
+// @Summary List all orders
+// @Description Returns all orders (Admin only)
+// @Tags orders
+// @Security BasicAuth
+// @Produce json
+// @Success 200 {array} orders.Order
+// @Failure 401 {string} string "Unauthorized"
+// @Router /orders [get]
 func (h *HTTPHandler) handleListOrders(w http.ResponseWriter, r *http.Request) {
 	orderList, err := h.svc.ListOrders(r.Context())
 	if err != nil {
@@ -101,6 +120,17 @@ func (h *HTTPHandler) handleListOrders(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleGetOrder retrieves a specific order
+// @Summary Get order by ID
+// @Description Returns order details (Admin only)
+// @Tags orders
+// @Security BasicAuth
+// @Param id path string true "Order UUID"
+// @Produce json
+// @Success 200 {object} orders.Order
+// @Failure 404 {string} string "Not Found"
+// @Failure 401 {string} string "Unauthorized"
+// @Router /orders/{id} [get]
 func (h *HTTPHandler) handleGetOrder(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := uuid.Parse(idStr)
