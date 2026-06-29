@@ -23,7 +23,7 @@ data:
       <h2>Last Order Receipt</h2>
       <pre id="receipt">No orders placed yet.</pre>
       <script>
-        const API_URL = "https://api.bookstore.mydomain.com";
+        const API_URL = "https://api.bookstore.miguelmoral.com";
         async function loadProducts() {
           try {
             const res = await fetch(API_URL + "/products");
@@ -115,7 +115,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: booksonline.mydomain.com
+  - host: booksonline.miguelmoral.com
     http:
       paths:
       - path: /
