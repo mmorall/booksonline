@@ -1,13 +1,16 @@
 apiVersion: chaos-mesh.org/v1alpha1
-kind: PodChaos
+kind: Schedule
 metadata:
   name: booksonline-api-assassin
   namespace: books-online
 spec:
-  action: pod-kill
-  mode: one
-  selector:
-    labelSelectors:
-      app: booksonline-api
-  scheduler:
-    cron: "@every 2m"
+  schedule: "@every 2m"
+  type: "PodChaos"
+  historyLimit: 2
+  concurrencyPolicy: Forbid
+  podChaos:
+    action: pod-kill
+    mode: one
+    selector:
+      labelSelectors:
+        app: booksonline-api
