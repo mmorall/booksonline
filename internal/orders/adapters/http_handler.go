@@ -3,12 +3,11 @@ package adapters
 import (
 	"encoding/json"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 
-	"github.com/mmorall/booksonline/internal/orders"
-
 	"github.com/google/uuid"
+	"github.com/mmorall/booksonline/internal/orders"
 )
 
 type HTTPHandler struct {
@@ -85,7 +84,7 @@ func (h *HTTPHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(order); err != nil {
-		log.Printf("failed to encode response: %v", err)
+		slog.Error("Failed to encode response", "error", err)
 	}
 }
 
@@ -98,7 +97,7 @@ func (h *HTTPHandler) handleListOrders(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(orderList); err != nil {
-		log.Printf("failed to encode response: %v", err)
+		slog.Error("Failed to encode response", "error", err)
 	}
 }
 
@@ -122,6 +121,6 @@ func (h *HTTPHandler) handleGetOrder(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(order); err != nil {
-		log.Printf("failed to encode response: %v", err)
+		slog.Error("Failed to encode response", "error", err)
 	}
 }

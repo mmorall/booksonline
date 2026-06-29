@@ -2,7 +2,7 @@ package config
 
 import (
 	"errors"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -16,7 +16,7 @@ type AppConfig struct {
 
 func Load() (*AppConfig, error) {
 	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file found, reading config from environment")
+		slog.Info("No .env file found, reading configuration from environment")
 	}
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {

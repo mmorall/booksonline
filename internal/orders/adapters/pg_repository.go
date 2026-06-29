@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
+	"log/slog"
 
 	"github.com/mmorall/booksonline/internal/orders"
 
@@ -26,7 +26,7 @@ func (r *PostgresRepository) Create(ctx context.Context, o *orders.Order) error 
 	}
 	defer func() {
 		if err = tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
-			log.Printf("failed to rollback transaction: %v", err)
+			slog.Error("Failed to rollback transaction", "error", err)
 		}
 	}()
 
@@ -67,7 +67,7 @@ func (r *PostgresRepository) GetByID(ctx context.Context, id uuid.UUID) (*orders
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			log.Printf("failed to close rows: %v", err)
+			slog.Error("Failed to close rows", "error", err)
 		}
 	}()
 
@@ -90,7 +90,7 @@ func (r *PostgresRepository) ListAll(ctx context.Context) ([]*orders.Order, erro
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			log.Printf("failed to close rows: %v", err)
+			slog.Error("Failed to close rows", "error", err)
 		}
 	}()
 
