@@ -1,124 +1,14 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: kiosk-html
-  namespace: books-online
-data:
-  index.html: |
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>BooksOnline</title>
-        <style>
-            body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-            .product { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
-            button { background: #007bff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
-            pre { background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto; }
-        </style>
-    </head>
-    <body>
-        <h1>BooksOnline Webshop</h1>
-        <div id="catalog">Loading products...</div>
-        <h2>Last Order Receipt</h2>
-        <pre id="receipt">No orders placed yet.</pre>
-        <script>
-            // Hardcoded to point to your live API
-            const API_URL = "https://api.bookstore.mydomain.com";
-
-            async function loadProducts() {
-                try {
-                    const res = await fetch(`${API_URL}/products`);
-                    const products = await res.json();
-                    document.getElementById('catalog').innerHTML = products.map(p => `
-                        <div class="product">
-                            <h3>${p.Name} (${p.Type})</h3>
-                            <p>Price: $${(p.PriceInCents / 100).toFixed(2)} | Stock: ${p.Stock}</p>
-                            <button onclick="buy('${p.ID}')">Buy 1 Now</button>
-                        </div>
-                    `).join('');
-                } catch (err) {
-                    document.getElementById('catalog').innerText = "Failed to load catalog.";
-                }
-            }
-
-            async function buy(productId) {
-                const receiptDiv = document.getElementById('receipt');
-                receiptDiv.innerText = "Processing...";
-                try {
-                    const res = await fetch(`${API_URL}/orders`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ customer_email: "guest@example.com", items: { [productId]: 1 } })
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data || "Checkout failed");
-                    receiptDiv.innerText = JSON.stringify(data, null, 2);
-                    loadProducts();
-                } catch (err) {
-                    receiptDiv.innerText = "Error: " + err.message;
-                }
-            }
-            loadProducts();
-        </script>
-    </body>
-    </html>
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: booksonline-frontend
-  namespace: books-online
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: booksonline-frontend
-  template:
-    metadata:
-      labels:
-        app: booksonline-frontend
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: html-volume
-          mountPath: /usr/share/nginx/html/index.html
-          subPath: index.html
-      volumes:
-      - name: html-volume
-        configMap:
-          name: kiosk-html
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: booksonline-frontend-svc
-  namespace: books-online
-spec:
-  selector:
-    app: booksonline-frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: booksonline-frontend-ingress
   namespace: books-online
   annotations:
-    kubernetes.io/ingress.class: traefik
+    kubernetes.io/ingress.class: traefik 
 spec:
+  ingressClassName: traefik
   rules:
-  - host: booksonline.mydomain.com
+  - host: booksonline.miguelmoral.com
     http:
       paths:
       - path: /
@@ -127,4 +17,4 @@ spec:
           service:
             name: booksonline-frontend-svc
             port:
-              number: 80
+              number: 80apiVersion: networking.k8s.io/v1

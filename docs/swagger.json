@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "api-bookstore.mydomain.com",
+    "host": "api-bookstore.miguelmoral.com",
     "basePath": "/",
     "paths": {
         "/orders": {

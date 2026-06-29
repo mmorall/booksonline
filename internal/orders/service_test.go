@@ -60,7 +60,7 @@ func TestOrderService_PlaceOrder_Success(t *testing.T) {
 	svc := orders.NewService(mockRepo, mockInv)
 
 	items := map[uuid.UUID]int{prodID: 2}
-	order, err := svc.PlaceOrder(ctx, "test@mydomain.com", items)
+	order, err := svc.PlaceOrder(ctx, "test@miguelmoral.com", items)
 
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -91,7 +91,7 @@ func TestOrderService_PlaceOrder_OutOfStock(t *testing.T) {
 	svc := orders.NewService(mockRepo, mockInv)
 	items := map[uuid.UUID]int{prodID: 1}
 
-	_, err := svc.PlaceOrder(ctx, "test@mydomain.com", items)
+	_, err := svc.PlaceOrder(ctx, "test@miguelmoral.com", items)
 
 	if !errors.Is(err, errOutOfStock) {
 		t.Errorf("expected out of stock error wrapping, got %v", err)

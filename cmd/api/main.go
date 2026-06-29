@@ -30,7 +30,7 @@ import (
 // @title BooksOnline API
 // @version 1.0
 // @description Backend service for managing catalog and orders.
-// @host api-bookstore.mydomain.com
+// @host api-bookstore.miguelmoral.com
 // @BasePath /
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
