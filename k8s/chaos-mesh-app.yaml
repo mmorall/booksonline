@@ -15,6 +15,10 @@ spec:
           value: containerd 
         - name: chaosDaemon.socketPath
           value: /run/k3s/containerd/containerd.sock
+        - name: dashboard.create
+          value: "true"
+        - name: scheduler.enabled
+      value: "true"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: chaos-mesh
