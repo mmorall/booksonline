@@ -72,8 +72,13 @@ func main() {
 	ordersHandler := ordersAdapters.NewHTTPHandler(ordersService, cfg.AdminUser, cfg.AdminPass)
 
 	mux := http.NewServeMux()
+
 	catalogHandler.RegisterRoutes(mux)
 	ordersHandler.RegisterRoutes(mux)
+
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "web/index.html")
+	})
 
 	mux.HandleFunc("GET /swagger/", httpSwagger.WrapHandler)
 
@@ -85,9 +90,14 @@ func main() {
 		}
 	})
 
+	handlerWithCORS := corsMiddleware(mux)
+
 	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: mux,
+		Addr:         ":8080",
+		Handler:      handlerWithCORS,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
 
 	go func() {
@@ -137,4 +147,19 @@ func runDBMigrations(db *sql.DB) {
 		slog.Error("Failed to run migrations", "error", err)
 		os.Exit(1)
 	}
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "https://booksonline.miguelmoral.com")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

@@ -21,6 +21,10 @@ The server starts on port `8080`. API documentation is available at:
 ```
 http://localhost:8080/swagger/index.html
 ```
+Or online at:
+```
+https://api-booksonline.miguelmoral.com/swagger/index.html
+```
 
 ### Test & Lint
 
