@@ -23,7 +23,7 @@ data:
       <h2>Last Order Receipt</h2>
       <pre id="receipt">No orders placed yet.</pre>
       <script>
-        const API_URL = "https://api-bookstore.miguelmoral.com";
+        const API_URL = "https://api-booksonline.miguelmoral.com";
         async function loadProducts() {
           try {
             const res = await fetch(API_URL + "/products");

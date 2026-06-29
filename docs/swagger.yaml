@@ -82,7 +82,7 @@ definitions:
     - StatusPending
     - StatusCompleted
     - StatusFailed
-host: api-bookstore.miguelmoral.com
+host: api-booksonline.miguelmoral.com
 info:
   contact: {}
   description: Backend service for managing catalog and orders.
