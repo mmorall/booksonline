@@ -29,6 +29,16 @@ spec:
             secretKeyRef:
               name: books-online-db-app # Created by CloudNativePG
               key: uri
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: admin-credentials
+              key: username
+        - name: ADMIN_PASS
+          valueFrom:
+            secretKeyRef:
+              name: admin-credentials
+              key: password
 
         # If the app freezes or fails, k3s will automatically restart it
         livenessProbe:

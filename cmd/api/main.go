@@ -11,28 +11,26 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/mmorall/booksonline/db/migrations"
 	"github.com/mmorall/booksonline/internal/catalog"
-	"github.com/mmorall/booksonline/internal/catalog/adapters"
-	"github.com/mmorall/booksonline/internal/catalog/db/migrations"
+	catalogAdapters "github.com/mmorall/booksonline/internal/catalog/adapters"
+	"github.com/mmorall/booksonline/internal/config"
+	"github.com/mmorall/booksonline/internal/orders"
+	ordersAdapters "github.com/mmorall/booksonline/internal/orders/adapters"
 
 	migrate "github.com/golang-migrate/migrate/v4"
 	migratepg "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, relying on system environment variables")
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		log.Fatal("DATABASE_URL environment variable is required")
-	}
-
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("postgres", cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Failed to open database connection: %v", err)
 	}
@@ -51,12 +49,17 @@ func main() {
 	runDBMigrations(db)
 	log.Println("Database migrations complete")
 
-	catalogRepo := adapters.NewPostgresRepository(db)
+	catalogRepo := catalogAdapters.NewPostgresRepository(db)
 	catalogService := catalog.NewService(catalogRepo)
-	catalogHandler := adapters.NewHTTPHandler(catalogService)
+	catalogHandler := catalogAdapters.NewHTTPHandler(catalogService)
+
+	ordersRepo := ordersAdapters.NewPostgresRepository(db)
+	ordersService := orders.NewService(ordersRepo, catalogService)
+	ordersHandler := ordersAdapters.NewHTTPHandler(ordersService, cfg.AdminUser, cfg.AdminPass)
 
 	mux := http.NewServeMux()
 	catalogHandler.RegisterRoutes(mux)
+	ordersHandler.RegisterRoutes(mux)
 
 	// Required for Kubernetes Liveness/Readiness Probes
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
